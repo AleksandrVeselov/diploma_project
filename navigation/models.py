@@ -39,13 +39,4 @@ class RouteGasStation(models.Model):
 
     route = models.ForeignKey(Route, on_delete=models.CASCADE, verbose_name='Маршрут')
     gas_stations = models.ManyToManyField(GasStation, verbose_name='Заправки')
-
-
-
-
-
-
-
-
-
-start_point = models.DecimalField(max_digits=5, decimal_places=2)
+    
