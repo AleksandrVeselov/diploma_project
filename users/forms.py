@@ -36,7 +36,7 @@ class UserProfileForm(UserChangeForm):
 
     class Meta:
         model = User
-        fields = ('email', 'name', 'surname')
+        fields = ('name', 'surname')
 
     def __init__(self, *args, **kwargs):
         """Стилизация формы"""

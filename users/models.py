@@ -12,3 +12,6 @@ class User(AbstractUser):
     surname = models.CharField(max_length=100, verbose_name='Фамилия')  # Фамилия пользователя
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
+
+    def __str__(self):
+        return f'{self.name} {self.surname}'

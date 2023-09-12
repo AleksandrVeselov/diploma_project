@@ -1,4 +1,10 @@
 {% extends 'navigation/base.html'%}
 
 {% block content %}
+{% if request.user.is_authenticated %}
+
+{% else %}
+    <h1>Перед началом работы пожалуйста</h1>
+    <h1>зарегистрируйтесь или авторизуйтесь на сайте</h1>
+{% endif %}
 {% endblock %}
