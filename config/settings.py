@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'users',
-    'navigation'
+    'navigation',
+    'social_django'
 ]
 
 MIDDLEWARE = [
@@ -66,6 +67,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect'
             ],
         },
     },
@@ -144,3 +147,16 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '49545565250-v0fkdmt1t5v2vv4tbsp4qvkaeuj0vc5e.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+LOGIN_URL = '/auth/login/google-oauth2/'
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
+
+# client_id - 49545565250-v0fkdmt1t5v2vv4tbsp4qvkaeuj0vc5e.apps.googleusercontent.com
+# client_secret - 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

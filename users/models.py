@@ -4,7 +4,7 @@ from django.db import models
 
 class User(AbstractUser):
     """Модель пользователя"""
-    username = None
+    username = models.CharField(max_length=32, blank=True, null=True)
 
     email = models.EmailField(unique=True, verbose_name='email')
 

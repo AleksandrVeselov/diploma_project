@@ -21,6 +21,9 @@
         {% else %}
         <a class="p-2 btn btn-outline-primary" href="{% url 'users:login' %}">Войти</a>
         <a class="p-2 btn btn-outline-primary" href="{% url 'users:register' %}">Регистрация</a>
+        <a class="btn btn-primary" href="{% url 'social:begin' 'google-oauth2' %}">
+        Войти через Google
+      </a>
         {% endif %}
     </nav>
 </div>
