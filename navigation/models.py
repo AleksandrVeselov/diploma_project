@@ -1,4 +1,7 @@
+from django.conf import settings
 from django.db import models
+
+NULLABLE = {'null': True, 'blank': True}  # для необязательного поля
 
 
 class Route(models.Model):
@@ -9,6 +12,8 @@ class Route(models.Model):
     time = models.DurationField(verbose_name='Общее время')
     distance = models.IntegerField(verbose_name='Общая дистанция')
     link_to_route = models.CharField(max_length=255, verbose_name='Ссылка на маршрут')
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+                              verbose_name='пользователь', **NULLABLE)
 
     class Meta:
         verbose_name = 'Маршрут'

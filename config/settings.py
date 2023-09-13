@@ -41,7 +41,8 @@ INSTALLED_APPS = [
 
     'users',
     'navigation',
-    'social_django'
+    'social_django',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -114,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'ru-ru'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
