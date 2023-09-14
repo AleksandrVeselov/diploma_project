@@ -1,5 +1,7 @@
 from django.shortcuts import render
-from navigation.models import Route
+from django.views.generic import ListView
+
+from navigation.models import Route, GasStation
 
 
 def home(request):
@@ -14,5 +16,11 @@ def home(request):
     }
 
     return render(request, 'navigation/homepage.html', context)
+
+
+class GasStationListView(ListView):
+    """Класс-контроллер для отображения списка АЗС на маршруте"""
+    model = GasStation
+
 
 
