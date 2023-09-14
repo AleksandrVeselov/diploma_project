@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import ListView
 
-from navigation.models import Route, GasStation
+from navigation.models import Route, RouteGasStation, GasStation
 
 
 def home(request):
@@ -20,7 +20,10 @@ def home(request):
 
 class GasStationListView(ListView):
     """Класс-контроллер для отображения списка АЗС на маршруте"""
-    model = GasStation
+    model = RouteGasStation
+
+
+
 
 
 
