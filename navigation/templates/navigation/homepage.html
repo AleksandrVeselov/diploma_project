@@ -18,7 +18,7 @@
       <div class="col themed-grid-col">{{ route.time }}</div>
       <div class="col themed-grid-col">{{ route.distance }}</div>
       <div class="col themed-grid-col">{{ route.link_to_route }}</div>
-      <div class="col themed-grid-col"><a class="p-2 btn btn-outline-primary" href="/">Список АЗС</a></div>
+      <div class="col themed-grid-col"><a class="p-2 btn btn-outline-primary" href="{% url 'navigation:gas-stations' route.pk %}">Список АЗС</a></div>
     </div>
 {% endfor %}
 {% else %}

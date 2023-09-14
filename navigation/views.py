@@ -20,7 +20,11 @@ def home(request):
 
 class GasStationListView(ListView):
     """Класс-контроллер для отображения списка АЗС на маршруте"""
-    model = RouteGasStation
+    model = Route
+
+    def get_queryset(self, *args, **kwargs):
+        route_gas_stations = RouteGasStation.objects.filter(route=self.kwargs.get('pk'))
+        return route_gas_stations
 
 
 
