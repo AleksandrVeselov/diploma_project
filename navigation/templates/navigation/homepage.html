@@ -23,6 +23,7 @@
       <div class="col themed-grid-col"><a class="p-2 btn btn-outline-primary" href="{% url 'navigation:gas-stations' route.pk %}">Список АЗС</a></div>
       <div class="col themed-grid-col"><a class="p-2 btn btn-outline-primary" href="{% url 'navigation:route_map' route.pk %}">Маршрут на карте</a></div>
       <div class="col themed-grid-col"><a class="p-2 btn btn-outline-primary" href="{% url 'navigation:route_update' route.pk %}">Редактировать маршрут</a></div>
+      <div class="col themed-grid-col"><a class="p-2 btn btn-outline-primary" href="{% url 'navigation:route_delete' route.pk %}">Удалить маршрут</a></div>
 
     </div>
 {% endfor %}

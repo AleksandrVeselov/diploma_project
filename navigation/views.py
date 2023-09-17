@@ -3,14 +3,15 @@ import polyline
 import requests
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, TemplateView, UpdateView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
-from navigation.forms import RouteForm
-from navigation.models import Route, RouteGasStation, GasStation
+from navigation.forms import RouteForm, CoordinateForm
+from navigation.models import Route, RouteGasStation, GasStation, RouteCoordinate
 
 
 def home(request):
     """Контроллер главной страницы"""
+
     if request.user:
         routes_list = Route.objects.filter(owner=request.user.id)  # список всех маршрутов текущего пользователя
     else:
@@ -74,6 +75,27 @@ def showmap(request, pk):
     map = russia_map._repr_html_()
     context = {'map': map}
     return render(request, 'navigation/map.html', context)
+
+
+class RouteDeleteView(DeleteView):
+    model = Route
+    success_url = reverse_lazy('navigation:home')
+
+
+class RouteCoordinateCreateView(CreateView):
+    model = RouteCoordinate
+    form_class = CoordinateForm
+    success_url = reverse_lazy('navigation:home')
+
+    def form_valid(self, form):
+        """Добавление в создаваемый продукт информации об авторизованном пользователе"""
+
+        route = form.save()  # сохранение информации о созданной рассылке
+        route.owner = self.request.user  # присваиваем атрибуту owner ссылку на текущего пользователя
+        route.save()
+        return super().form_valid(form)
+
+
 
 
 

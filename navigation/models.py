@@ -8,8 +8,8 @@ class RouteCoordinate(models.Model):
     """Модель координаты для маршрута"""
 
     title = models.TextField(verbose_name='Название точки')
-    latitude = models.DecimalField(max_digits=8, decimal_places=6, verbose_name='Широта')
-    longitude = models.DecimalField(max_digits=8, decimal_places=6, verbose_name='Долгота')
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name='Широта')
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name='Долгота')
 
     class Meta:
         verbose_name = 'Координата'
@@ -38,6 +38,21 @@ class Route(models.Model):
     end_point = models.ForeignKey(RouteCoordinate, on_delete=models.CASCADE,
                                   verbose_name='Конечная точка',
                                   related_name='end_point')
+    middle_point1 = models.ForeignKey(RouteCoordinate,
+                                          verbose_name='Промежуточная координата1',
+                                          **NULLABLE,
+                                          related_name='middle_point1',
+                                          on_delete=models.SET_NULL)
+    middle_point2 = models.ForeignKey(RouteCoordinate,
+                                      verbose_name='Промежуточная координата2',
+                                      **NULLABLE,
+                                      related_name='middle_point2',
+                                      on_delete=models.SET_NULL)
+    middle_point3 = models.ForeignKey(RouteCoordinate,
+                                      verbose_name='Промежуточная координата3',
+                                      **NULLABLE,
+                                      related_name='middle_point3',
+                                      on_delete=models.SET_NULL)
     route = models.JSONField(**NULLABLE, verbose_name='Координаты маршрута')
 
     class Meta:

@@ -1,8 +1,7 @@
-import polyline
 import requests
 from django import forms
 
-from navigation.models import Route
+from navigation.models import Route, RouteCoordinate
 
 
 class RouteForm(forms.ModelForm):
@@ -10,17 +9,29 @@ class RouteForm(forms.ModelForm):
 
     class Meta:
         model = Route
-        fields = ('name', 'title', 'start_point', 'end_point')
+        fields = ('name', 'title', 'start_point', 'end_point', 'middle_point1', 'middle_point2', 'middle_point3')
 
     def save(self):
         route = super().save()
-        print(route)
-        route_url = (f'http://router.project-osrm.org/route/v1/driving/{repr(route.start_point)};'
-                     f'{repr(route.end_point)}?alternatives=true&geometries=polyline&overview=full')
-
+        points = [(str(point.longitude), str(point.latitude)) for point in route.middle_point.all()]
+        points_string = ';'.join(','.join(point) for point in points)
+        print(points)
+        if points:
+            route_url = (f'http://router.project-osrm.org/route/v1/driving/{repr(route.start_point)};'
+                         f'{points_string};{repr(route.end_point)}?alternatives=true&geometries=polyline&overview=full')
+            print(route_url)
+        else:
+            route_url = (f'http://router.project-osrm.org/route/v1/driving/{repr(route.start_point)};'
+                        f'{repr(route.end_point)}?alternatives=true&geometries=polyline&overview=full')
         r = requests.get(route_url)  # отправляем запрос на API для построения маршрута
         res = r.json()
         route.route = res['routes'][0]['geometry']
         route.distance = res['routes'][0]['distance'] / 1000
         route.duration = res['routes'][0]['duration'] / 3600
         return route
+
+
+class CoordinateForm(forms.ModelForm):
+    class Meta:
+        model = RouteCoordinate
+        fields = ('title', 'latitude', 'longitude')
