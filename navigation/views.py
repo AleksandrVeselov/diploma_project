@@ -1,6 +1,11 @@
+import folium
+import polyline
+import requests
 from django.shortcuts import render
-from django.views.generic import ListView
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, TemplateView, UpdateView
 
+from navigation.forms import RouteForm
 from navigation.models import Route, RouteGasStation, GasStation
 
 
@@ -27,6 +32,48 @@ class GasStationListView(ListView):
         return route_gas_stations
 
 
+class RouteCreateView(CreateView):
+    model = Route
+    form_class = RouteForm
+    success_url = reverse_lazy('navigation:home')
+
+    def form_valid(self, form):
+        """Добавление в создаваемый продукт информации об авторизованном пользователе"""
+
+        route = form.save()  # сохранение информации о созданной рассылке
+        route.owner = self.request.user  # присваиваем атрибуту owner ссылку на текущего пользователя
+        route.save()
+        return super().form_valid(form)
+
+
+class RouteUpdateView(UpdateView):
+    model = Route
+    form_class = RouteForm
+    success_url = reverse_lazy('navigation:home')
+
+
+def showmap(request, pk):
+    route = Route.objects.get(pk=pk)
+    decode_route = polyline.decode(route.route)
+
+    russia_map = folium.Map(
+        location=[64.6863136, 97.7453061],  # широта и долгота России
+        zoom_start=4
+    )
+
+    figure = folium.Figure()
+    folium.PolyLine(decode_route, weight=8, color='blue', opacity=0.6).add_to(russia_map)
+    # a = get_AZS()
+    #
+    # for z in a:
+    #     print(z['width'])
+    #
+    #     folium.Marker(location=(z['width'], z['longitude']), icon=folium.Icon(icon='play', color='green')).add_to(
+    #         russia_map)
+    figure.render()
+    map = russia_map._repr_html_()
+    context = {'map': map}
+    return render(request, 'navigation/map.html', context)
 
 
 

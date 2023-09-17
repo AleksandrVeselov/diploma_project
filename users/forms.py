@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.mail import send_mail
 
+from navigation.models import Route
 from users.models import User
 
 
@@ -45,3 +46,4 @@ class UserProfileForm(UserChangeForm):
             field.widget.attrs['class'] = 'form-control'
 
         self.fields['password'].widget = forms.HiddenInput()
+

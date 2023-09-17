@@ -4,30 +4,55 @@ from django.db import models
 NULLABLE = {'null': True, 'blank': True}  # для необязательного поля
 
 
+class RouteCoordinate(models.Model):
+    """Модель координаты для маршрута"""
+
+    title = models.TextField(verbose_name='Название точки')
+    latitude = models.DecimalField(max_digits=8, decimal_places=6, verbose_name='Широта')
+    longitude = models.DecimalField(max_digits=8, decimal_places=6, verbose_name='Долгота')
+
+    class Meta:
+        verbose_name = 'Координата'
+        verbose_name_plural = 'Координаты'
+
+    def __str__(self):
+        return self.title
+
+    def __repr__(self):
+        return f'{self.longitude},{self.latitude}'
+
+
 class Route(models.Model):
     """Модель маршрута"""
 
-    start_point = models.CharField(max_length=155, verbose_name='Начальная точка')
-    end_point = models.CharField(max_length=155, verbose_name='Конечная точка')
-    time = models.DurationField(verbose_name='Общее время')
-    distance = models.IntegerField(verbose_name='Общая дистанция')
-    link_to_route = models.CharField(max_length=255, verbose_name='Ссылка на маршрут')
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+    name = models.CharField(max_length=155, verbose_name='Название маршрута')
+    title = models.TextField(verbose_name='Описание маршрута')
+    duration = models.DecimalField(max_digits=5, decimal_places=2, verbose_name='Общее время', **NULLABLE)
+    distance = models.DecimalField(max_digits=7, decimal_places=2, verbose_name='Общая дистанция', **NULLABLE)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL,
+                              on_delete=models.CASCADE,
                               verbose_name='пользователь', **NULLABLE)
+    start_point = models.ForeignKey(RouteCoordinate, on_delete=models.CASCADE,
+                                    verbose_name='Начальная точка',
+                                    related_name='start_point')
+    end_point = models.ForeignKey(RouteCoordinate, on_delete=models.CASCADE,
+                                  verbose_name='Конечная точка',
+                                  related_name='end_point')
+    route = models.JSONField(**NULLABLE, verbose_name='Координаты маршрута')
 
     class Meta:
         verbose_name = 'Маршрут'
         verbose_name_plural = 'Маршруты'
 
     def __str__(self):
-        return f'{self.start_point}-{self.end_point}'
+        return self.name
 
 
 class GasStation(models.Model):
     """Модель заправка"""
     price_diesel_fuel = models.DecimalField(max_digits=5, decimal_places=1, verbose_name='Стоимость дизельного топлива')
     altitude = models.IntegerField(verbose_name='Высота над уровнем моря')
-    width = models.DecimalField(max_digits=5, decimal_places=2, verbose_name='Широта')
+    latitude = models.DecimalField(max_digits=5, decimal_places=2, verbose_name='Широта')
     longitude = models.DecimalField(max_digits=5, decimal_places=2, verbose_name='Долгота')
     address = models.TextField(verbose_name='Адрес')
 
@@ -36,7 +61,7 @@ class GasStation(models.Model):
         verbose_name_plural = 'Заправки'
 
     def __str__(self):
-        return f'Координаты - широта: {self.width}, долгота: {self.longitude}'
+        return f'({self.latitude}, {self.longitude})'
 
 
 class RouteGasStation(models.Model):

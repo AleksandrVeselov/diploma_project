@@ -3,22 +3,27 @@
 {% block content %}
 {% if request.user.is_authenticated %}
     <h2 class="mt-4">Ваши маршруты</h2>
-      <div class="row row-cols-md-3 mb-3">
+      <div class="row row-cols-md-4 mb-4">
         <div class="col themed-grid-col">Стартовая точка</div>
         <div class="col themed-grid-col">Конечная точка</div>
         <div class="col themed-grid-col">Длительность</div>
         <div class="col themed-grid-col">Общая дистанция</div>
-        <div class="col themed-grid-col">Ссылка на маршрут</div>
+        <div class="col themed-grid-col"></div>
+        <div class="col themed-grid-col"></div>
+        <div class="col themed-grid-col"></div>
         <div class="col themed-grid-col"></div>
       </div>
 {% for route in object_list %}
-    <div class="row row-cols-md-3 mb-3">
+    <div class="row row-cols-md-3 mb-4">
       <div class="col themed-grid-col">{{ route.start_point }}</div>
       <div class="col themed-grid-col">{{ route.end_point }}</div>
-      <div class="col themed-grid-col">{{ route.time }}</div>
-      <div class="col themed-grid-col">{{ route.distance }}</div>
+      <div class="col themed-grid-col">{{ route.duration }} ч</div>
+      <div class="col themed-grid-col">{{ route.distance }} км</div>
       <div class="col themed-grid-col">{{ route.link_to_route }}</div>
       <div class="col themed-grid-col"><a class="p-2 btn btn-outline-primary" href="{% url 'navigation:gas-stations' route.pk %}">Список АЗС</a></div>
+      <div class="col themed-grid-col"><a class="p-2 btn btn-outline-primary" href="{% url 'navigation:route_map' route.pk %}">Маршрут на карте</a></div>
+      <div class="col themed-grid-col"><a class="p-2 btn btn-outline-primary" href="{% url 'navigation:route_update' route.pk %}">Редактировать маршрут</a></div>
+
     </div>
 {% endfor %}
 {% else %}
