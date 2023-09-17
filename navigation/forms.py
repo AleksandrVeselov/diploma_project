@@ -12,17 +12,18 @@ class RouteForm(forms.ModelForm):
         fields = ('name', 'title', 'start_point', 'end_point', 'middle_point1', 'middle_point2', 'middle_point3')
 
     def save(self):
+
         route = super().save()
-        points = [(str(point.longitude), str(point.latitude)) for point in route.middle_point.all()]
-        points_string = ';'.join(','.join(point) for point in points)
-        print(points)
+        points = filter(lambda x: x is not None,
+                        [route.middle_point1, route.middle_point2, route.middle_point3])
+        coordinates = ';'.join([repr(point) for point in points])
+
         if points:
             route_url = (f'http://router.project-osrm.org/route/v1/driving/{repr(route.start_point)};'
-                         f'{points_string};{repr(route.end_point)}?alternatives=true&geometries=polyline&overview=full')
-            print(route_url)
+                         f'{coordinates};{repr(route.end_point)}?alternatives=true&geometries=polyline&overview=full')
         else:
             route_url = (f'http://router.project-osrm.org/route/v1/driving/{repr(route.start_point)};'
-                        f'{repr(route.end_point)}?alternatives=true&geometries=polyline&overview=full')
+                         f'{repr(route.end_point)}?alternatives=true&geometries=polyline&overview=full')
         r = requests.get(route_url)  # отправляем запрос на API для построения маршрута
         res = r.json()
         route.route = res['routes'][0]['geometry']

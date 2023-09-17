@@ -43,6 +43,7 @@ class RouteCreateView(CreateView):
 
         route = form.save()  # сохранение информации о созданной рассылке
         route.owner = self.request.user  # присваиваем атрибуту owner ссылку на текущего пользователя
+        print('Done!')
         route.save()
         return super().form_valid(form)
 
@@ -51,6 +52,13 @@ class RouteUpdateView(UpdateView):
     model = Route
     form_class = RouteForm
     success_url = reverse_lazy('navigation:home')
+
+    def form_valid(self, form):
+
+        form.save()  # сохранение информации о созданной рассылке
+        return super().form_valid(form)
+
+
 
 
 def showmap(request, pk):
