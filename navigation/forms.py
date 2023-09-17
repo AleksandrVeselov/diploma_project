@@ -23,6 +23,7 @@ class RouteForm(forms.ModelForm):
                          f'{coordinates};{repr(route.end_point)}?alternatives=true&geometries=polyline&overview=full')
         else:
             route_url = (f'http://router.project-osrm.org/route/v1/driving/{repr(route.start_point)};'
+                         
                          f'{repr(route.end_point)}?alternatives=true&geometries=polyline&overview=full')
         r = requests.get(route_url)  # отправляем запрос на API для построения маршрута
         res = r.json()

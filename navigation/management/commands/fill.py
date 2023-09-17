@@ -43,7 +43,7 @@ class Command(BaseCommand):
                     price_diesel_fuel = ''.join(filter(filter_func, w[5].value[0:4]))
 
                 # добавляем азс в список
-                azs.append({'width': w[2].value,
+                azs.append({'latitude': w[2].value,
                             'longitude': w[3].value,
                             'address': w[1].value,
                             'price_diesel_fuel': price_diesel_fuel,
