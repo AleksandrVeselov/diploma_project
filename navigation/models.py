@@ -70,6 +70,7 @@ class GasStation(models.Model):
     latitude = models.DecimalField(max_digits=5, decimal_places=2, verbose_name='Широта')
     longitude = models.DecimalField(max_digits=5, decimal_places=2, verbose_name='Долгота')
     address = models.TextField(verbose_name='Адрес')
+    nearest_road_points = models.JSONField(verbose_name='Точки на дорогах')
 
     class Meta:
         verbose_name = 'Заправка'

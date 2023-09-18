@@ -6,6 +6,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
 from navigation.forms import RouteForm, CoordinateForm
+from navigation.management.commands.utils import filter_gas_stations
 from navigation.models import Route, RouteGasStation, GasStation, RouteCoordinate
 
 
@@ -55,6 +56,7 @@ class RouteUpdateView(UpdateView):
     def form_valid(self, form):
 
         form.save()  # сохранение информации о созданной рассылке
+        print('save')
         return super().form_valid(form)
 
 
@@ -69,24 +71,24 @@ def showmap(request, pk):
 
     figure = folium.Figure()
     folium.PolyLine(decode_route, weight=8, color='blue', opacity=0.6).add_to(russia_map)
-    a = GasStation.objects.all()
+    route_gas_stations = filter_gas_stations(decode_route)
+    for station in route_gas_stations:
+        # weather_url = (f'https://api.open-meteo.com/v1/forecast?latitude={station.latitude}&longitude={station.longitude}'
+        #                f'&daily=temperature_2m_max&forecast_days=1')
+        # response = requests.get(weather_url)
+        # weather = response.json()['daily']['temperature_2m_max'][0]
 
-    for z in a:
-        weather_url = (f'https://api.open-meteo.com/v1/forecast?latitude={z.latitude}&longitude={z.longitude}'
-                       f'&daily=temperature_2m_max&forecast_days=1')
-        response = requests.get(weather_url)
-        weather = response.json()['daily']['temperature_2m_max'][0]
-
-        popup = {'Дизельное топливо': z.price_diesel_fuel,
-                 'Погода': weather,
-                 'Высота над уровнем моря': z.altitude,
-                 'Адрес': z.address,
-                 'Координаты': str(z),
+        popup = {'Дизельное топливо': station.price_diesel_fuel,
+                 'Погода': 'weather',
+                 'Высота над уровнем моря': station.altitude,
+                 'Адрес': station.address,
+                 'Координаты': str(station),
                  }
 
-        folium.Marker(location=(z.latitude, z.longitude),
+        folium.Marker(location=(station.latitude, station.longitude),
                       icon=folium.Icon(icon='play', color='green'),
                       popup=popup).add_to(russia_map)
+
     figure.render()
     map = russia_map._repr_html_()
     context = {'map': map}
