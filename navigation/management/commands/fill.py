@@ -15,7 +15,7 @@ def filter_func(symbol):
 
 
 def get_nearest_points(latitude, longitude):
-    url = f'http://router.project-osrm.org/nearest/v1/driving/{longitude},{latitude}?number=30&bearings=0,20'
+    url = f'http://router.project-osrm.org/nearest/v1/driving/{longitude},{latitude}?number=30&bearings=0,10'
     response = requests.get(url)
     nearest_coords = []
     if response.status_code == 200:

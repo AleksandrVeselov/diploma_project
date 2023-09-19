@@ -67,8 +67,8 @@ class GasStation(models.Model):
     """Модель заправка"""
     price_diesel_fuel = models.DecimalField(max_digits=5, decimal_places=1, verbose_name='Стоимость дизельного топлива')
     altitude = models.IntegerField(verbose_name='Высота над уровнем моря')
-    latitude = models.DecimalField(max_digits=5, decimal_places=2, verbose_name='Широта')
-    longitude = models.DecimalField(max_digits=5, decimal_places=2, verbose_name='Долгота')
+    latitude = models.DecimalField(max_digits=9, decimal_places=5, verbose_name='Широта')
+    longitude = models.DecimalField(max_digits=9, decimal_places=5, verbose_name='Долгота')
     address = models.TextField(verbose_name='Адрес')
     nearest_road_points = models.JSONField(verbose_name='Точки на дорогах')
 
