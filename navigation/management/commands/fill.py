@@ -14,18 +14,6 @@ def filter_func(symbol):
         return False
 
 
-def get_nearest_points(latitude, longitude):
-    url = f'http://router.project-osrm.org/nearest/v1/driving/{longitude},{latitude}?number=30&bearings=0,10'
-    response = requests.get(url)
-    nearest_coords = []
-    if response.status_code == 200:
-        points = response.json()['waypoints']
-        for point in points:
-            nearest_coords.append(point['location'])
-
-    return nearest_coords
-
-
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
@@ -54,14 +42,13 @@ class Command(BaseCommand):
                 # если есть 2 тип
                 elif w[5].value:
                     price_diesel_fuel = ''.join(filter(filter_func, w[5].value[0:4]))
-                nearest_points = get_nearest_points(w[2].value, w[3].value)
                 # добавляем азс в список
                 azs.append({'latitude': w[2].value,
                             'longitude': w[3].value,
                             'address': w[1].value,
                             'price_diesel_fuel': price_diesel_fuel,
-                            'altitude': 2,
-                            'nearest_road_points': nearest_points})
+                            'altitude': 2
+                            })
 
         azs_for_create = [] # список экземпляров класса GasStation
         for a in azs:

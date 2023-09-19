@@ -29,7 +29,6 @@ class GasStation(models.Model):
     latitude = models.DecimalField(max_digits=9, decimal_places=5, verbose_name='Широта')
     longitude = models.DecimalField(max_digits=9, decimal_places=5, verbose_name='Долгота')
     address = models.TextField(verbose_name='Адрес')
-    nearest_road_points = models.JSONField(verbose_name='Точки на дорогах')
 
     class Meta:
         verbose_name = 'Заправка'
@@ -71,7 +70,6 @@ class Route(models.Model):
                                       related_name='middle_point3',
                                       on_delete=models.SET_NULL)
     route = models.JSONField(**NULLABLE, verbose_name='Координаты маршрута')
-    gas_stations = models.ManyToManyField(GasStation, verbose_name='Заправки маршрута')
 
     class Meta:
         verbose_name = 'Маршрут'
