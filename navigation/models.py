@@ -22,6 +22,23 @@ class RouteCoordinate(models.Model):
         return f'{self.longitude},{self.latitude}'
 
 
+class GasStation(models.Model):
+    """Модель заправка"""
+    price_diesel_fuel = models.DecimalField(max_digits=5, decimal_places=1, verbose_name='Стоимость дизельного топлива')
+    altitude = models.IntegerField(verbose_name='Высота над уровнем моря')
+    latitude = models.DecimalField(max_digits=9, decimal_places=5, verbose_name='Широта')
+    longitude = models.DecimalField(max_digits=9, decimal_places=5, verbose_name='Долгота')
+    address = models.TextField(verbose_name='Адрес')
+    nearest_road_points = models.JSONField(verbose_name='Точки на дорогах')
+
+    class Meta:
+        verbose_name = 'Заправка'
+        verbose_name_plural = 'Заправки'
+
+    def __str__(self):
+        return f'({self.latitude}, {self.longitude})'
+
+
 class Route(models.Model):
     """Модель маршрута"""
 
@@ -54,6 +71,7 @@ class Route(models.Model):
                                       related_name='middle_point3',
                                       on_delete=models.SET_NULL)
     route = models.JSONField(**NULLABLE, verbose_name='Координаты маршрута')
+    gas_stations = models.ManyToManyField(GasStation, verbose_name='Заправки маршрута')
 
     class Meta:
         verbose_name = 'Маршрут'
@@ -63,26 +81,9 @@ class Route(models.Model):
         return self.name
 
 
-class GasStation(models.Model):
-    """Модель заправка"""
-    price_diesel_fuel = models.DecimalField(max_digits=5, decimal_places=1, verbose_name='Стоимость дизельного топлива')
-    altitude = models.IntegerField(verbose_name='Высота над уровнем моря')
-    latitude = models.DecimalField(max_digits=9, decimal_places=5, verbose_name='Широта')
-    longitude = models.DecimalField(max_digits=9, decimal_places=5, verbose_name='Долгота')
-    address = models.TextField(verbose_name='Адрес')
-    nearest_road_points = models.JSONField(verbose_name='Точки на дорогах')
-
-    class Meta:
-        verbose_name = 'Заправка'
-        verbose_name_plural = 'Заправки'
-
-    def __str__(self):
-        return f'({self.latitude}, {self.longitude})'
-
-
 class RouteGasStation(models.Model):
     """Заправки на маршруте"""
 
-    route = models.ForeignKey(Route, on_delete=models.CASCADE, verbose_name='Маршрут')
+    route = models.OneToOneField(Route, on_delete=models.CASCADE, verbose_name='Маршрут')
     gas_stations = models.ManyToManyField(GasStation, verbose_name='Заправки')
     

@@ -61,36 +61,50 @@ class RouteUpdateView(UpdateView):
 
 
 def showmap(request, pk):
-    route = Route.objects.get(pk=pk)
-    decode_route = polyline.decode(route.route)
+    """Контроллер для отображения карты на странице"""
+    route = Route.objects.get(pk=pk)  # получаем маршрут по его id
+
+    decode_route = polyline.decode(route.route)  # декодируем геометрию для получение координат на маршруте
 
     russia_map = folium.Map(
         location=[64.6863136, 97.7453061],  # широта и долгота России
-        zoom_start=4
-    )
+        zoom_start=4  # масштаб карты
+    )  # получаем карту России
 
     figure = folium.Figure()
-    folium.PolyLine(decode_route, weight=8, color='blue', opacity=0.6).add_to(russia_map)
-    route_gas_stations = filter_gas_stations(decode_route)
-    for station in route_gas_stations:
-        # weather_url = (f'https://api.open-meteo.com/v1/forecast?latitude={station.latitude}&longitude={station.longitude}'
-        #                f'&daily=temperature_2m_max&forecast_days=1')
-        # response = requests.get(weather_url)
-        # weather = response.json()['daily']['temperature_2m_max'][0]
+
+    folium.PolyLine(decode_route, weight=8, color='blue', opacity=0.6).add_to(russia_map)  # рисуем на карте маршрут
+    gas_stations_on_route = RouteGasStation.objects.get(route=route)  # получаем заправки на маршруте
+
+    # цикл для отображения заправок на карте
+    for station in gas_stations_on_route.gas_stations.all():
+
+        # url для получения погоды по координатам
+        weather_url = (f'https://api.open-meteo.com/v1/forecast?latitude={station.latitude}&'
+                       f'longitude={station.longitude}&daily=temperature_2m_max&forecast_days=1')
+
+        elevation_url = (f'https://api.open-meteo.com/v1/elevation?latitude={station.latitude}&'
+                       f'longitude={station.longitude}')
+
+        weather_response = requests.get(weather_url)  # ответ с сайта
+        elevation_response = requests.get(elevation_url)  # ответ с сайта
+        weather = weather_response.json()['daily']['temperature_2m_max'][0]  # температура
+        elevation = elevation_response.json()['elevation']  # высота над уровнем моря
 
         popup = {'Дизельное топливо': station.price_diesel_fuel,
-                 'Погода': 'weather',
-                 'Высота над уровнем моря': station.altitude,
+                 'Погода': weather,
+                 'Высота над уровнем моря': elevation,
                  'Адрес': station.address,
                  'Координаты': str(station),
-                 }
+                 }  # заметка на маркере АЗС на карте
 
         folium.Marker(location=(station.latitude, station.longitude),
                       icon=folium.Icon(icon='play', color='green'),
-                      popup=popup).add_to(russia_map)
+                      popup=popup).add_to(russia_map)  # добаляем на карту маркер АЗС
 
-    figure.render()
-    map = russia_map._repr_html_()
+    figure.render()  # отрисовываем карту
+
+    map = russia_map._repr_html_()  # получаем код страницы для передачи в шаблон
     context = {'map': map}
     return render(request, 'navigation/map.html', context)
 
