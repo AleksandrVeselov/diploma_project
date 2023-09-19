@@ -1,0 +1,21 @@
+{% extends 'navigation/base.html' %}
+
+{% block content %}
+    <h2 class="mt-4">Список АЗС на маршруте {{ route_gas_stations.route }}</h2>
+    <div class="row row-cols-md-4 mb-4">
+        <div class="col themed-grid-col">Стоимость дизельного топлива</div>
+        <div class="col themed-grid-col">Долгота</div>
+        <div class="col themed-grid-col">Широта</div>
+        <div class="col themed-grid-col">Адрес</div>
+        <div class="col themed-grid-col"></div>
+    </div>
+    {% for object in route_gas_stations.gas_stations.all %}
+        <div class="row row-cols-md-3 mb-4">
+            <div class="col themed-grid-col">{{ object.price_diesel_fuel }}</div>
+            <div class="col themed-grid-col">{{ object.longitude }}</div>
+            <div class="col themed-grid-col">{{ object.latitude }}</div>
+            <div class="col themed-grid-col">{{ object.address }}</div>
+            <div class="col themed-grid-col"></div>
+        </div>
+    {% endfor %}}
+{% endblock %}

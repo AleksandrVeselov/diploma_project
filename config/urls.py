@@ -20,5 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('navigation.urls', namespace='navigation')),
     path('users/', include('users.urls', namespace='users')),
-         path('', include('social_django.urls', namespace='social'))
+    path('', include('social_django.urls', namespace='social'))
 ]

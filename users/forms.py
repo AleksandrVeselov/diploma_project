@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.mail import send_mail
 
+from navigation.models import Route
 from users.models import User
 
 
@@ -18,6 +19,19 @@ class UserRegisterForm(UserCreationForm):
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
 
+    def save(self, commit=True):
+        """смена у пользователя флага на неактивный и отправка на почту пользователя
+        письма с ссылкой на активацию"""
+
+        user = super().save()  # сохранение в переменной пользователя
+        send_mail(subject='Активация',
+                  message=f'Для активации профиля пройдите по ссылке - http://127.0.0.1:8000/users/activate/{user.id}/',
+                  from_email=settings.EMAIL_HOST_USER,
+                  recipient_list=[user.email])  # отправка письма на почту
+        user.is_active = False  # смена флага на неактивный
+        user.save()  # сохранение
+        return user
+
 
 class UserProfileForm(UserChangeForm):
 
@@ -32,3 +46,4 @@ class UserProfileForm(UserChangeForm):
             field.widget.attrs['class'] = 'form-control'
 
         self.fields['password'].widget = forms.HiddenInput()
+

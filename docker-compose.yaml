@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  db:
+    image: 'postgres'
+    env_file:
+      - .env
+    environment:
+      PG_DATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - '5433:5432'
+
+  app:
+    build: .
+    command: bash -c "python manage.py migrate && python manage.py fill && python manage.py create_su && python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - '8000:8000'
+    depends_on:
+      - 'db'
