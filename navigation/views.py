@@ -3,7 +3,7 @@ import polyline
 import requests
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
 
 from navigation.forms import RouteForm, CoordinateForm
 from navigation.management.commands.utils import filter_gas_stations
@@ -25,13 +25,16 @@ def home(request):
     return render(request, 'navigation/homepage.html', context)
 
 
-class GasStationListView(ListView):
+class RouteGasStationView(TemplateView):
     """Класс-контроллер для отображения списка АЗС на маршруте"""
-    model = Route
+    # model = Route
+    template_name = 'navigation/routegasstation_list.html'
 
-    def get_queryset(self, *args, **kwargs):
-        route_gas_stations = RouteGasStation.objects.filter(route=self.kwargs.get('pk'))
-        return route_gas_stations
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        route_gas_stations = RouteGasStation.objects.get(route=self.kwargs.get('pk'))
+        context['route_gas_stations'] = route_gas_stations
+        return context
 
 
 class RouteCreateView(CreateView):
