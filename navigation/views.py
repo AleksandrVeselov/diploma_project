@@ -104,7 +104,6 @@ def showmap(request, pk):
         folium.Marker(location=(station.latitude, station.longitude),
                       icon=folium.Icon(icon='play', color='green'),
                       popup=popup).add_to(russia_map)  # добаляем на карту маркер АЗС
-
     figure.render()  # отрисовываем карту
 
     map = russia_map._repr_html_()  # получаем код страницы для передачи в шаблон

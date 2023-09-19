@@ -44,17 +44,24 @@ class RouteForm(forms.ModelForm):
             # сохраняем в базе данных длительность маршрута, переведенную в часы
             route.duration = res['routes'][0]['duration'] / 3600
 
-            gas_stations_on_route = filter_gas_stations(route.route)
+            gas_stations_on_route = filter_gas_stations(route.route)  # получаем заправки на маршруте
+
+            # проверяем есть ли в базе данных заправки на маршруте по id
             route_gas_station_model = RouteGasStation.objects.filter(route=route)
+
+            # если пришел путсой список, создаем экземпляр класса RouteGasStation и записываем в него заправки
             if not route_gas_station_model:
                 route_gas_station_model = RouteGasStation.objects.create(route=route)
                 route_gas_station_model.gas_stations.set(gas_stations_on_route)
+
+            # иначе обновляем заправки на маршруте
             else:
                 route_gas_station_model[0].gas_stations.set(gas_stations_on_route)
         return route
 
 
 class CoordinateForm(forms.ModelForm):
+    """форма для создания координат"""
     class Meta:
         model = RouteCoordinate
         fields = ('title', 'latitude', 'longitude')
