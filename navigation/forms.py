@@ -1,7 +1,7 @@
 import requests
 from django import forms
 
-from navigation.management.commands.utils import filter_gas_stations
+from navigation.management.commands.utils import filter_gas_stations, get_route
 from navigation.models import Route, RouteCoordinate, RouteGasStation
 
 
@@ -15,49 +15,35 @@ class RouteForm(forms.ModelForm):
     def save(self):
         """Сохранение информации о созданном маршруте"""
 
-        route = super().save()
-
-        # промежуточные точки на маршруте
-        points = list(filter(lambda x: x is not None,
-                        [route.middle_point1, route.middle_point2, route.middle_point3]))
-
-        # если промежуточные точки есть
+        new_route = super().save()
+        points = filter(lambda x: x is not None,
+                        [new_route.middle_point1, new_route.middle_point2, new_route.middle_point3])
         if points:
-            coordinates = ';'.join([repr(point) for point in points])  # собираем точки в строку
-
-            # формируем url для отправки запроса на сервер построения маршрутов
-            route_url = (f'http://router.project-osrm.org/route/v1/driving/{repr(route.start_point)};'
-                         f'{coordinates};{repr(route.end_point)}?alternatives=true&geometries=polyline&overview=full')
-
-        # если промежуточных точек нет
+            new_route_geometry = get_route(new_route.start_point, new_route.end_point, *points)
         else:
-            # формируем url для отправки запроса на сервер построения маршрутов
-            route_url = (f'http://router.project-osrm.org/route/v1/driving/{repr(route.start_point)};'
-                         f'{repr(route.end_point)}?alternatives=true&geometries=polyline&overview=full')
-        request = requests.get(route_url)  # отправляем запрос на сервер для построения маршрута
-        if request.status_code == 200:
-            res = request.json()  # ответ с сервера в формате json
-            route.route = res['routes'][0]['geometry']  # сохранем в базе данных геометрию маршрута
+            new_route_geometry = get_route(new_route.start_point, new_route.end_point)
+        new_route.route = new_route_geometry['routes'][0]['geometry']  # сохраняем в базе данных геометрию маршрута
+        new_route.route = new_route_geometry['routes'][0]['geometry']  # сохранем в базе данных геометрию маршрута
 
-            # сохраняем в базе данных геометрию дистанцию маршрута, переведенную в километры
-            route.distance = res['routes'][0]['distance'] / 1000
-            # сохраняем в базе данных длительность маршрута, переведенную в часы
-            route.duration = res['routes'][0]['duration'] / 3600
+        # сохраняем в базе данных геометрию дистанцию маршрута, переведенную в километры
+        new_route.distance = new_route_geometry['routes'][0]['distance'] / 1000
+        # сохраняем в базе данных длительность маршрута, переведенную в часы
+        new_route.duration = new_route_geometry['routes'][0]['duration'] / 3600
 
-            gas_stations_on_route = filter_gas_stations(route.route)  # получаем заправки на маршруте
+        gas_stations_on_route = filter_gas_stations(new_route.route)  # получаем заправки на маршруте
 
-            # проверяем есть ли в базе данных заправки на маршруте по id
-            route_gas_station_model = RouteGasStation.objects.filter(route=route)
+        # проверяем есть ли в базе данных заправки на маршруте по id
+        route_gas_station_model = RouteGasStation.objects.filter(route=new_route)
 
-            # если пришел путсой список, создаем экземпляр класса RouteGasStation и записываем в него заправки
-            if not route_gas_station_model:
-                route_gas_station_model = RouteGasStation.objects.create(route=route)
-                route_gas_station_model.gas_stations.set(gas_stations_on_route)
+        # если пришел пустой список, создаем экземпляр класса RouteGasStation и записываем в него заправки
+        if not route_gas_station_model:
+            route_gas_station_model = RouteGasStation.objects.create(route=new_route)
+            route_gas_station_model.gas_stations.set(gas_stations_on_route)
 
-            # иначе обновляем заправки на маршруте
-            else:
-                route_gas_station_model[0].gas_stations.set(gas_stations_on_route)
-        return route
+        # иначе обновляем заправки на маршруте
+        else:
+            route_gas_station_model[0].gas_stations.set(gas_stations_on_route)
+        return new_route
 
 
 class CoordinateForm(forms.ModelForm):

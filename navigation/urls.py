@@ -2,7 +2,7 @@ from django.urls import path
 
 from navigation.apps import NavigationConfig
 from navigation.views import (home, RouteGasStationView, RouteCreateView, showmap, RouteUpdateView, RouteDeleteView,
-                              RouteCoordinateCreateView, RouteListAPIView, RouteCreateAPIView)
+                              RouteCoordinateCreateView, RouteListAPIView, RouteCreateAPIView, RouteUpdateAPIView)
 
 app_name = NavigationConfig.name
 
@@ -15,7 +15,6 @@ urlpatterns = [
     path('route/delete/<int:pk>', RouteDeleteView.as_view(), name='route_delete'),
     path('point/create', RouteCoordinateCreateView.as_view(), name='point_create'),
     path('api/route/', RouteListAPIView.as_view(), name='route_api_list'),
-    path('api/route/create/', RouteCreateAPIView.as_view(), name='route_api_create')
-
-
+    path('api/route/create/', RouteCreateAPIView.as_view(), name='route_api_create'),
+    path('api/route/update/<int:pk>', RouteUpdateAPIView.as_view(), name='route_api_update')
 ]

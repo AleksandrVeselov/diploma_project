@@ -10,7 +10,7 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
 from navigation.forms import RouteForm, CoordinateForm
-from navigation.management.commands.utils import filter_gas_stations
+from navigation.management.commands.utils import filter_gas_stations, get_route
 from navigation.models import Route, RouteGasStation, RouteCoordinate
 from navigation.serializers import RouteSerializer
 
@@ -162,58 +162,47 @@ class RouteCreateAPIView(generics.CreateAPIView):
     serializer_class = RouteSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-
-        new_route = serializer.save()
-
-        points = list(filter(lambda x: x is not None,
-                        [new_route.middle_point1, new_route.middle_point2, new_route.middle_point3]))
-
-        # если промежуточные точки есть
-        if points:
-            coordinates = ';'.join([repr(point) for point in points])  # собираем точки в строку
-
-            # формируем url для отправки запроса на сервер построения маршрутов
-            route_url = (f'http://router.project-osrm.org/route/v1/driving/{repr(new_route.start_point)};'
-                         f'{coordinates};{repr(new_route.end_point)}?alternatives=true&geometries=polyline&overview=full')
-
-        # если промежуточных точек нет
-        else:
-            # формируем url для отправки запроса на сервер построения маршрутов
-            route_url = (f'http://router.project-osrm.org/route/v1/driving/{repr(new_route.start_point)};'
-                         f'{repr(new_route.end_point)}?alternatives=true&geometries=polyline&overview=full')
-        request = requests.get(route_url)  # отправляем запрос на сервер для построения маршрута
-        if request.status_code == 200:
-            res = request.json()  # ответ с сервера в формате json
-            new_route.route = res['routes'][0]['geometry']  # сохранем в базе данных геометрию маршрута
-
-            # сохраняем в базе данных геометрию дистанцию маршрута, переведенную в километры
-            new_route.distance = res['routes'][0]['distance'] / 1000
-            # сохраняем в базе данных длительность маршрута, переведенную в часы
-            new_route.duration = res['routes'][0]['duration'] / 3600
-            gas_stations_on_route = filter_gas_stations(new_route.route)  # получаем заправки на маршруте
-
-            # проверяем есть ли в базе данных заправки на маршруте по id
-            route_gas_station_model = RouteGasStation.objects.filter(route=new_route)
-
-            # если пришел путсой список, создаем экземпляр класса RouteGasStation и записываем в него заправки
-            if not route_gas_station_model:
-                route_gas_station_model = RouteGasStation.objects.create(route=new_route)
-                route_gas_station_model.gas_stations.set(gas_stations_on_route)
-
-            # иначе обновляем заправки на маршруте
-            else:
-                route_gas_station_model[0].gas_stations.set(gas_stations_on_route)
-            new_route.owner = self.request.user
-            new_route.save()
+    # def perform_create(self, serializer):
+    #
+    #     new_route = serializer.save()
+        # points = filter(lambda x: x is not None,
+        #                 [new_route.middle_point1, new_route.middle_point2, new_route.middle_point3])
+        # if points:
+        #     new_route_geometry = get_route(new_route.start_point, new_route.end_point, *points)
+        # else:
+        #     new_route_geometry = get_route(new_route.start_point, new_route.end_point)
+        # new_route.route = new_route_geometry['routes'][0]['geometry']  # сохраняем в базе данных геометрию маршрута
+        #
+        # # сохраняем в базе данных геометрию дистанцию маршрута, переведенную в километры
+        # new_route.distance = new_route_geometry['routes'][0]['distance'] / 1000
+        # # сохраняем в базе данных длительность маршрута, переведенную в часы
+        # new_route.duration = new_route_geometry['routes'][0]['duration'] / 3600
+        # gas_stations_on_route = filter_gas_stations(new_route.route)  # получаем заправки на маршруте
+        #
+        # # проверяем есть ли в базе данных заправки на маршруте по id
+        # route_gas_station_model = RouteGasStation.objects.filter(route=new_route)
+        #
+        # # если пришел пустой список, создаем экземпляр класса RouteGasStation и записываем в него заправки
+        # if not route_gas_station_model:
+        #     route_gas_station_model = RouteGasStation.objects.create(route=new_route)
+        #     route_gas_station_model.gas_stations.set(gas_stations_on_route)
+        #
+        # # иначе обновляем заправки на маршруте
+        # else:
+        #     route_gas_station_model[0].gas_stations.set(gas_stations_on_route)
+        # new_route.owner = self.request.user
+        # new_route.save()
 
 
-class RouteUpdateApiView(generics.UpdateAPIView):
+class RouteUpdateAPIView(generics.UpdateAPIView):
     """Класс-контроллер для обновления информации о маршруте"""
     serializer_class = RouteSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_update(self, serializer):
+    def get_queryset(self):
+        """Фильтрация привычек текущего пользователя"""
+        queryset = Route.objects.filter(owner=self.request.user)
+        return queryset
 
 
 
