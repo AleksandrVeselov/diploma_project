@@ -12,7 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from navigation.forms import RouteForm, CoordinateForm
 from navigation.management.commands.utils import filter_gas_stations, get_route
 from navigation.models import Route, RouteGasStation, RouteCoordinate
-from navigation.serializers import RouteSerializer
+from navigation.serializers import RouteSerializer, RouteCoordinateSerializer
 
 
 def home(request):
@@ -50,6 +50,12 @@ class RouteCreateView(CreateView, LoginRequiredMixin):
     model = Route
     form_class = RouteForm
     success_url = reverse_lazy('navigation:home')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'request': self.request})
+        return kwargs
+
 
     def form_valid(self, form):
         """Добавление в создаваемый продукт информации об авторизованном пользователе"""
@@ -137,9 +143,9 @@ class RouteCoordinateCreateView(CreateView, LoginRequiredMixin):
     def form_valid(self, form):
         """Добавление в создаваемый продукт информации об авторизованном пользователе"""
 
-        route = form.save()  # сохранение информации о созданной рассылке
-        route.owner = self.request.user  # присваиваем атрибуту owner ссылку на текущего пользователя
-        route.save()
+        coordinate = form.save()  # сохранение информации о созданной рассылке
+        coordinate.owner = self.request.user  # присваиваем атрибуту owner ссылку на текущего пользователя
+        coordinate.save()
         return super().form_valid(form)
 
 
@@ -159,39 +165,9 @@ class RouteListAPIView(generics.ListAPIView):
 
 class RouteCreateAPIView(generics.CreateAPIView):
     """Класс-контроллер для создания экземпляра класса Route"""
+
     serializer_class = RouteSerializer
     permission_classes = [IsAuthenticated]
-
-    # def perform_create(self, serializer):
-    #
-    #     new_route = serializer.save()
-        # points = filter(lambda x: x is not None,
-        #                 [new_route.middle_point1, new_route.middle_point2, new_route.middle_point3])
-        # if points:
-        #     new_route_geometry = get_route(new_route.start_point, new_route.end_point, *points)
-        # else:
-        #     new_route_geometry = get_route(new_route.start_point, new_route.end_point)
-        # new_route.route = new_route_geometry['routes'][0]['geometry']  # сохраняем в базе данных геометрию маршрута
-        #
-        # # сохраняем в базе данных геометрию дистанцию маршрута, переведенную в километры
-        # new_route.distance = new_route_geometry['routes'][0]['distance'] / 1000
-        # # сохраняем в базе данных длительность маршрута, переведенную в часы
-        # new_route.duration = new_route_geometry['routes'][0]['duration'] / 3600
-        # gas_stations_on_route = filter_gas_stations(new_route.route)  # получаем заправки на маршруте
-        #
-        # # проверяем есть ли в базе данных заправки на маршруте по id
-        # route_gas_station_model = RouteGasStation.objects.filter(route=new_route)
-        #
-        # # если пришел пустой список, создаем экземпляр класса RouteGasStation и записываем в него заправки
-        # if not route_gas_station_model:
-        #     route_gas_station_model = RouteGasStation.objects.create(route=new_route)
-        #     route_gas_station_model.gas_stations.set(gas_stations_on_route)
-        #
-        # # иначе обновляем заправки на маршруте
-        # else:
-        #     route_gas_station_model[0].gas_stations.set(gas_stations_on_route)
-        # new_route.owner = self.request.user
-        # new_route.save()
 
 
 class RouteUpdateAPIView(generics.UpdateAPIView):
@@ -203,6 +179,47 @@ class RouteUpdateAPIView(generics.UpdateAPIView):
         """Фильтрация привычек текущего пользователя"""
         queryset = Route.objects.filter(owner=self.request.user)
         return queryset
+
+
+class RouteDestroyAPIView(generics.DestroyAPIView):
+    """Класс-контроллер для удаления маршрута Route"""
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """фильтрация по пользователю"""
+
+        queryset = Route.objects.filter(owner=self.request.user)
+
+        return queryset
+
+
+class CoordinateCreateAPIView(generics.CreateAPIView):
+    """класс-контроллер для создания модели Point"""
+    permission_classes = [IsAuthenticated]
+    serializer_class = RouteCoordinateSerializer
+
+    def perform_create(self, serializer):
+        """Добавление пользователя координате"""
+
+        new_coordinate = serializer.save()  # сохранение привычки
+        new_coordinate.owner = self.request.user  # добавляем пользователя
+        new_coordinate.save()
+
+
+class CoordinateListAPIView(generics.ListAPIView):
+    """класс-представление для вывода списка точек, созданных авторизованным пользователем"""
+
+    serializer_class = RouteCoordinateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """фильтрация маршрутов по текущему пользователю"""
+
+        queryset = RouteCoordinate.objects.filter(owner=self.request.user)
+
+        return queryset
+
+
 
 
 

@@ -10,6 +10,10 @@ class RouteCoordinate(models.Model):
     title = models.TextField(verbose_name='Название точки')
     latitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name='Широта')
     longitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name='Долгота')
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL,
+                              on_delete=models.CASCADE,
+                              verbose_name='Пользователь',
+                              **NULLABLE)
 
     class Meta:
         verbose_name = 'Координата'

@@ -12,6 +12,16 @@ class RouteForm(forms.ModelForm):
         model = Route
         fields = ('name', 'title', 'start_point', 'end_point', 'middle_point1', 'middle_point2', 'middle_point3')
 
+    def __init__(self, request, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # фильтруем координаты, созданные авторизованным пользователем
+        self.fields['start_point'].queryset = RouteCoordinate.objects.filter(owner=request.user)
+        self.fields['end_point'].queryset = RouteCoordinate.objects.filter(owner=request.user)
+        self.fields['middle_point1'].queryset = RouteCoordinate.objects.filter(owner=request.user)
+        self.fields['middle_point2'].queryset = RouteCoordinate.objects.filter(owner=request.user)
+        self.fields['middle_point3'].queryset = RouteCoordinate.objects.filter(owner=request.user)
+
     def save(self):
         """Сохранение информации о созданном маршруте"""
 
