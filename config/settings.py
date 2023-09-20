@@ -87,7 +87,7 @@ DATABASES = {
         'NAME': os.getenv('POSTGRES_DB'),
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': os.getenv('POSTGRES_HOST')
+        # 'HOST': os.getenv('POSTGRES_HOST')
     }
 }
 
@@ -148,15 +148,9 @@ EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
 
 AUTHENTICATION_BACKENDS = (
-    'social_core.backends.google.GoogleOAuth2',
+     'social_core.backends.vk.VKOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
 
-SOCIAL_AUTH_DEFAULT_USERNAME = lambda: random.choice(['Darth_Vader', 'Obi-Wan_Kenobi', 'R2-D2', 'C-3PO', 'Yoda'])
-# Разрешаем создавать пользователей через social_auth
-SOCIAL_AUTH_CREATE_USERS = True
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '49545565250-v0fkdmt1t5v2vv4tbsp4qvkaeuj0vc5e.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
-SOCIAL_AUTH_POSTGRES_JSONFIELD = True
-LOGIN_URL = 'login'
-SOCIAL_AUTH_URL_NAMESPACE = 'social'
+SOCIAL_AUTH_VK_OAUTH2_KEY = os.getenv('VK_APP_ID')
+SOCIAL_AUTH_VK_OAUTH2_SECRET = os.getenv('VK_API_SECRET')
