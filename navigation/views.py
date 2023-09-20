@@ -156,8 +156,11 @@ class RouteListAPIView(generics.ListAPIView):
 
         return queryset
 
+
 class RouteCreateAPIView(generics.CreateAPIView):
     """Класс-контроллер для создания экземпляра класса Route"""
+    serializer_class = RouteSerializer
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
 
@@ -177,7 +180,7 @@ class RouteCreateAPIView(generics.CreateAPIView):
         # если промежуточных точек нет
         else:
             # формируем url для отправки запроса на сервер построения маршрутов
-            route_url = (f'http://router.project-osrm.org/route/v1/driving/{repr(route.start_point)};'
+            route_url = (f'http://router.project-osrm.org/route/v1/driving/{repr(new_route.start_point)};'
                          f'{repr(new_route.end_point)}?alternatives=true&geometries=polyline&overview=full')
         request = requests.get(route_url)  # отправляем запрос на сервер для построения маршрута
         if request.status_code == 200:
@@ -201,8 +204,17 @@ class RouteCreateAPIView(generics.CreateAPIView):
             # иначе обновляем заправки на маршруте
             else:
                 route_gas_station_model[0].gas_stations.set(gas_stations_on_route)
-
+            new_route.owner = self.request.user
             new_route.save()
+
+
+class RouteUpdateApiView(generics.UpdateAPIView):
+    """Класс-контроллер для обновления информации о маршруте"""
+    serializer_class = RouteSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_update(self, serializer):
+
 
 
 
