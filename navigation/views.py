@@ -10,9 +10,8 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
 from navigation.forms import RouteForm, CoordinateForm
-from navigation.management.commands.utils import filter_gas_stations, get_route
 from navigation.models import Route, RouteGasStation, RouteCoordinate
-from navigation.serializers import RouteSerializer, RouteCoordinateSerializer
+from navigation.serializers import RouteSerializer, RouteCoordinateSerializer, RouteGasStationSerializer
 
 
 def home(request):
@@ -52,10 +51,11 @@ class RouteCreateView(CreateView, LoginRequiredMixin):
     success_url = reverse_lazy('navigation:home')
 
     def get_form_kwargs(self):
+        """Передача в форму request"""
+
         kwargs = super().get_form_kwargs()
         kwargs.update({'request': self.request})
         return kwargs
-
 
     def form_valid(self, form):
         """Добавление в создаваемый продукт информации об авторизованном пользователе"""
@@ -193,6 +193,19 @@ class RouteDestroyAPIView(generics.DestroyAPIView):
         return queryset
 
 
+class RouteGasStationsListAPIView(generics.ListAPIView):
+    """Просмотр информации о заправках на маршруте"""
+    serializer_class = RouteGasStationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self, **kwargs):
+        """фильтрация заправок"""
+
+        route_gas_stations = RouteGasStation.objects.filter(route=self.kwargs['pk'])
+        queryset = route_gas_stations[0].gas_stations.all()
+        return queryset
+
+
 class CoordinateCreateAPIView(generics.CreateAPIView):
     """класс-контроллер для создания модели Point"""
     permission_classes = [IsAuthenticated]
@@ -218,7 +231,6 @@ class CoordinateListAPIView(generics.ListAPIView):
         queryset = RouteCoordinate.objects.filter(owner=self.request.user)
 
         return queryset
-
 
 
 

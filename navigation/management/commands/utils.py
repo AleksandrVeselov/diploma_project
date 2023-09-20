@@ -15,9 +15,26 @@ def filter_gas_stations(route):
         for coord in decode_route:
             if coord[1] - 0.03 < gas_station.longitude < coord[1] + 0.03:
                 if coord[0] - 0.03 < gas_station.latitude < coord[0] + 0.03:
+                    altitude = get_altitude(gas_station)
+                    gas_station.altitude = altitude
+                    gas_station.save()
                     route_gas_stations.append(gas_station)
                     break
     return route_gas_stations
+
+
+def get_altitude(station):
+    """
+    Функция для вычисления по координатам высоты над уровнем моря
+    """
+
+    # url для получения высоты точки над уровнем моря
+    elevation_url = (f'https://api.open-meteo.com/v1/elevation?latitude={station.latitude}&'
+                     f'longitude={station.longitude}')
+
+    elevation_response = requests.get(elevation_url)  # ответ с сайта с высотой над уровнем моря
+    elevation = elevation_response.json()['elevation'][0]  # высота над уровнем моря
+    return elevation
 
 
 def get_route(start_point: float, end_point: float, *points):

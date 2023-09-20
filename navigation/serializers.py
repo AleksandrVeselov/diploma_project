@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from navigation.management.commands.utils import get_route, filter_gas_stations
-from navigation.models import Route, RouteCoordinate, RouteGasStation
+from navigation.models import Route, RouteCoordinate, RouteGasStation, GasStation
 
 
 class RouteSerializer(serializers.ModelSerializer):
@@ -44,7 +44,14 @@ class RouteSerializer(serializers.ModelSerializer):
 
 
 class RouteCoordinateSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = RouteCoordinate
         fields = '__all__'
+
+
+class RouteGasStationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = GasStation
+        fields = '__all__'
+
