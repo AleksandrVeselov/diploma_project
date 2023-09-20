@@ -149,7 +149,7 @@ EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
 
 AUTHENTICATION_BACKENDS = (
-     'social_core.backends.vk.VKOAuth2',
+    'social_core.backends.vk.VKOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
 
