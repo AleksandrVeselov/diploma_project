@@ -114,7 +114,7 @@ def showmap(request, pk):
 
         popup = {'Дизельное топливо': station.price_diesel_fuel,
                  'Погода': weather,
-                 'Высота над уровнем моря': station.elevation,
+                 'Высота над уровнем моря': station.altitude,
                  'Адрес': station.address,
                  'Координаты': str(station),
                  }  # заметка на маркере АЗС на карте
@@ -142,7 +142,7 @@ class RouteCoordinateCreateView(CreateView, LoginRequiredMixin):
     success_url = reverse_lazy('navigation:home')
 
     def form_valid(self, form):
-        """Добавление в создаваемый продукт информации об авторизованном пользователе"""
+        """Добавление информации об авторизованном пользователе"""
 
         coordinate = form.save()  # сохранение информации о созданной рассылке
         coordinate.owner = self.request.user  # присваиваем атрибуту owner ссылку на текущего пользователя
@@ -151,7 +151,7 @@ class RouteCoordinateCreateView(CreateView, LoginRequiredMixin):
 
 
 class RouteListAPIView(generics.ListAPIView):
-    """Класс-контроллер для модели Route на основе """
+    """Класс-контроллер для модели Route"""
 
     serializer_class = RouteSerializer
     permission_classes = [IsAuthenticated]
@@ -177,7 +177,7 @@ class RouteUpdateAPIView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        """Фильтрация привычек текущего пользователя"""
+        """Фильтрация по пользователю"""
         queryset = Route.objects.filter(owner=self.request.user)
         return queryset
 
