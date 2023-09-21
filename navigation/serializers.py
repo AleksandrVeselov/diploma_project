@@ -50,7 +50,6 @@ class RouteCoordinateSerializer(serializers.ModelSerializer):
         model = RouteCoordinate
         fields = '__all__'
 
-
 class RouteGasStationSerializer(serializers.ModelSerializer):
 
     class Meta:

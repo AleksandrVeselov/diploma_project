@@ -1,7 +1,5 @@
 import openpyxl
-import requests
 from django.core.management import BaseCommand
-import pandas as pd
 
 from navigation.models import GasStation
 
