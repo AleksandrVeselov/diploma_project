@@ -8,18 +8,26 @@ def filter_gas_stations(route):
     """
     Функция для фильтрации заправок по маршруту
     """
-    decode_route = polyline.decode(route)
-    route_gas_stations = []
-    gas_stations = GasStation.objects.all()
+
+    decode_route = polyline.decode(route)  # декодирование маршрута
+    route_gas_stations = []  # список заправок на маршруте
+    gas_stations = GasStation.objects.all()  # заправки из базы данных
+
     for gas_station in gas_stations:
         for coord in decode_route:
+
+            # если долгота заправки входит в диапазон
             if coord[1] - 0.03 < gas_station.longitude < coord[1] + 0.03:
+
+                # если широта заправки входит в диапазон, значит она находится где-то рядом с точкой на маршруте
                 if coord[0] - 0.03 < gas_station.latitude < coord[0] + 0.03:
-                    altitude = get_altitude(gas_station)
-                    gas_station.altitude = altitude
-                    gas_station.save()
-                    route_gas_stations.append(gas_station)
+
+                    altitude = get_altitude(gas_station) # запрашиваем от api ее высоту
+                    gas_station.altitude = altitude  # присваиваем атрибуту altitude
+                    gas_station.save()  # сохраняем
+                    route_gas_stations.append(gas_station)  # добавляем в список заправок на маршруте
                     break
+
     return route_gas_stations
 
 

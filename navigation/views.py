@@ -109,18 +109,12 @@ def showmap(request, pk):
         weather_url = (f'https://api.open-meteo.com/v1/forecast?latitude={station.latitude}&'
                        f'longitude={station.longitude}&daily=temperature_2m_max&forecast_days=1')
 
-        # url для получения высоты точки над уровнем моря
-        elevation_url = (f'https://api.open-meteo.com/v1/elevation?latitude={station.latitude}&'
-                         f'longitude={station.longitude}')
-
         weather_response = requests.get(weather_url)  # ответ с сайта с погодой
-        elevation_response = requests.get(elevation_url)  # ответ с сайта с высотой над уровнем моря
         weather = weather_response.json()['daily']['temperature_2m_max'][0]  # температура
-        elevation = elevation_response.json()['elevation']  # высота над уровнем моря
 
         popup = {'Дизельное топливо': station.price_diesel_fuel,
                  'Погода': weather,
-                 'Высота над уровнем моря': elevation,
+                 'Высота над уровнем моря': station.elevation,
                  'Адрес': station.address,
                  'Координаты': str(station),
                  }  # заметка на маркере АЗС на карте

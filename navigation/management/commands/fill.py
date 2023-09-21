@@ -7,6 +7,8 @@ from navigation.models import GasStation
 
 
 def filter_func(symbol):
+    """отбрасывание ненужных символов"""
+
     required_symbols = '0123456789.'
     if symbol in required_symbols:
         return True

@@ -23,8 +23,10 @@ class RouteSerializer(serializers.ModelSerializer):
 
         # сохраняем в базе данных геометрию дистанцию маршрута, переведенную в километры
         new_route.distance = new_route_geometry['routes'][0]['distance'] / 1000
+
         # сохраняем в базе данных длительность маршрута, переведенную в часы
         new_route.duration = new_route_geometry['routes'][0]['duration'] / 3600
+
         gas_stations_on_route = filter_gas_stations(new_route.route)  # получаем заправки на маршруте
 
         # проверяем есть ли в базе данных заправки на маршруте по id

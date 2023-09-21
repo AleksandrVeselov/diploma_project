@@ -33,10 +33,10 @@ class RouteForm(forms.ModelForm):
         else:
             new_route_geometry = get_route(new_route.start_point, new_route.end_point)
         new_route.route = new_route_geometry['routes'][0]['geometry']  # сохраняем в базе данных геометрию маршрута
-        new_route.route = new_route_geometry['routes'][0]['geometry']  # сохранем в базе данных геометрию маршрута
 
-        # сохраняем в базе данных геометрию дистанцию маршрута, переведенную в километры
+        # сохраняем в базе данных дистанцию маршрута, переведенную в километры
         new_route.distance = new_route_geometry['routes'][0]['distance'] / 1000
+
         # сохраняем в базе данных длительность маршрута, переведенную в часы
         new_route.duration = new_route_geometry['routes'][0]['duration'] / 3600
 
@@ -53,6 +53,7 @@ class RouteForm(forms.ModelForm):
         # иначе обновляем заправки на маршруте
         else:
             route_gas_station_model[0].gas_stations.set(gas_stations_on_route)
+
         return new_route
 
 

@@ -153,6 +153,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
+# настройки авторизации для вк
 SOCIAL_AUTH_VK_OAUTH2_KEY = os.getenv('VK_APP_ID')
 SOCIAL_AUTH_VK_OAUTH2_SECRET = os.getenv('VK_API_SECRET')
 
@@ -162,6 +163,7 @@ REST_FRAMEWORK = {
     ],
 }
 
+# настройки jwt авторизации
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
