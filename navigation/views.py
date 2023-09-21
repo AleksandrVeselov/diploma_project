@@ -77,6 +77,13 @@ class RouteUpdateView(UpdateView, LoginRequiredMixin):
         form.save()  # сохранение информации о созданном маршруте
         return super().form_valid(form)
 
+    def get_form_kwargs(self):
+        """Передача в форму request"""
+
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'request': self.request})
+        return kwargs
+
 
 @login_required
 def showmap(request, pk):
