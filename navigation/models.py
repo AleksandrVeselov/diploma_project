@@ -7,7 +7,7 @@ NULLABLE = {'null': True, 'blank': True}  # для необязательног�
 class RouteCoordinate(models.Model):
     """Модель координаты для маршрута"""
 
-    title = models.TextField(verbose_name='Название точки')
+    title = models.CharField(max_length=50, verbose_name='Название точки')
     latitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name='Широта')
     longitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name='Долгота')
     owner = models.ForeignKey(settings.AUTH_USER_MODEL,
