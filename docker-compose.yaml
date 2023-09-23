@@ -17,7 +17,7 @@ services:
 
   app:
     build: .
-    command: bash -c "python manage.py migrate && python manage.py fill && python manage.py create_su && python manage.py runserver 0.0.0.0:8000"
+    command: bash -c "python manage.py migrate && python manage.py fill && python manage.py runserver 0.0.0.0:8000"
     ports:
       - '8000:8000'
     depends_on:
